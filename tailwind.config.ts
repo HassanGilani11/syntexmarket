@@ -78,6 +78,14 @@ export default {
 					DEFAULT: 'hsl(var(--danger))',
 					foreground: 'hsl(var(--danger-foreground))'
 				},
+				bullish: {
+					DEFAULT: 'hsl(var(--bullish))',
+					light: 'hsl(var(--bullish-light))'
+				},
+				bearish: {
+					DEFAULT: 'hsl(var(--bearish))',
+					light: 'hsl(var(--bearish-light))'
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
