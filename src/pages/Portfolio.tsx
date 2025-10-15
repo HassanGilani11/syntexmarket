@@ -7,12 +7,18 @@ import { PieChart, Cell, Pie, ResponsiveContainer, Legend, Tooltip } from 'recha
 const Portfolio = () => {
   const stocks = useStockData(mockStocks);
   
-  // Mock portfolio data
+  // Mock portfolio data with 10 top companies
   const portfolio = [
     { symbol: 'AAPL', shares: 15, costBasis: 150.75 },
     { symbol: 'MSFT', shares: 8, costBasis: 380.25 },
     { symbol: 'NVDA', shares: 5, costBasis: 820.50 },
     { symbol: 'GOOGL', shares: 10, costBasis: 145.30 },
+    { symbol: 'AMZN', shares: 12, costBasis: 135.20 },
+    { symbol: 'TSLA', shares: 6, costBasis: 220.80 },
+    { symbol: 'META', shares: 9, costBasis: 310.50 },
+    { symbol: 'JPM', shares: 20, costBasis: 165.40 },
+    { symbol: 'V', shares: 7, costBasis: 240.30 },
+    { symbol: 'JNJ', shares: 15, costBasis: 158.90 },
   ];
   
   // Calculate portfolio values

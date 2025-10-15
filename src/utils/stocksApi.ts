@@ -134,6 +134,26 @@ export const mockStocks: Stock[] = [
     volume: 8943760,
     marketCap: 548000000000,
     lastUpdated: new Date()
+  },
+  {
+    symbol: 'JPM',
+    name: 'JPMorgan Chase & Co.',
+    price: 178.45,
+    change: 2.15,
+    changePercent: 1.22,
+    volume: 9234560,
+    marketCap: 515000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'JNJ',
+    name: 'Johnson & Johnson',
+    price: 162.30,
+    change: -0.85,
+    changePercent: -0.52,
+    volume: 7123450,
+    marketCap: 398000000000,
+    lastUpdated: new Date()
   }
 ];
 

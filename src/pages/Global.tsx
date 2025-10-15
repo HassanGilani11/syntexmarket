@@ -8,9 +8,23 @@ const Global = () => {
   const indices = useMarketIndices(mockIndices);
   
   const regions = [
-    { name: 'North America', markets: ['United States', 'Canada'] },
-    { name: 'Europe', markets: ['United Kingdom', 'Germany', 'France', 'Switzerland'] },
-    { name: 'Asia-Pacific', markets: ['Japan', 'China', 'Hong Kong', 'Australia'] },
+    { name: 'North America', markets: ['United States', 'Canada', 'Mexico', 'Brazil'] },
+    { name: 'Europe', markets: ['United Kingdom', 'Germany', 'France', 'Switzerland', 'Italy', 'Spain', 'Netherlands'] },
+    { name: 'Asia-Pacific', markets: ['Japan', 'China', 'Hong Kong', 'Australia', 'South Korea', 'India', 'Singapore', 'Taiwan'] },
+    { name: 'Middle East & Africa', markets: ['Saudi Arabia', 'UAE', 'South Africa', 'Israel'] },
+  ];
+  
+  const economicEvents = [
+    { time: '08:30 AM', region: 'United States', event: 'Non-Farm Payrolls', impact: 'High' },
+    { time: '09:00 AM', region: 'United States', event: 'Unemployment Rate', impact: 'High' },
+    { time: '10:00 AM', region: 'Eurozone', event: 'ECB Interest Rate Decision', impact: 'High' },
+    { time: '10:30 AM', region: 'United Kingdom', event: 'BoE Rate Decision', impact: 'High' },
+    { time: '12:00 PM', region: 'Japan', event: 'Industrial Production', impact: 'Medium' },
+    { time: '01:00 PM', region: 'Germany', event: 'Manufacturing PMI', impact: 'Medium' },
+    { time: '02:00 PM', region: 'United Kingdom', event: 'GDP (QoQ)', impact: 'Medium' },
+    { time: '03:30 PM', region: 'United States', event: 'Fed Speech', impact: 'Medium' },
+    { time: '04:00 PM', region: 'China', event: 'Trade Balance', impact: 'Medium' },
+    { time: '05:00 PM', region: 'Canada', event: 'CPI Data', impact: 'High' },
   ];
   
   return (
@@ -61,30 +75,22 @@ const Global = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="py-2 px-4">08:30 AM</td>
-                  <td className="py-2 px-4">United States</td>
-                  <td className="py-2 px-4">Non-Farm Payrolls</td>
-                  <td className="py-2 px-4">
-                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">High</span>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-2 px-4">10:00 AM</td>
-                  <td className="py-2 px-4">Eurozone</td>
-                  <td className="py-2 px-4">ECB Interest Rate Decision</td>
-                  <td className="py-2 px-4">
-                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">High</span>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-2 px-4">02:00 PM</td>
-                  <td className="py-2 px-4">United Kingdom</td>
-                  <td className="py-2 px-4">GDP (QoQ)</td>
-                  <td className="py-2 px-4">
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Medium</span>
-                  </td>
-                </tr>
+                {economicEvents.map((event, index) => (
+                  <tr key={index} className="border-b">
+                    <td className="py-2 px-4">{event.time}</td>
+                    <td className="py-2 px-4">{event.region}</td>
+                    <td className="py-2 px-4">{event.event}</td>
+                    <td className="py-2 px-4">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        event.impact === 'High' 
+                          ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' 
+                          : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                      }`}>
+                        {event.impact}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
