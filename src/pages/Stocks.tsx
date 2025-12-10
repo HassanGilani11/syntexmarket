@@ -10,21 +10,19 @@ import { RefreshCw } from 'lucide-react';
 
 const Stocks = () => {
   const { stocks, loading, lastFetched, refetch } = useRealStockData(300000);
-  const [selectedStock, setSelectedStock] = React.useState(stocks[0]);
+  const [selectedSymbol, setSelectedSymbol] = React.useState<string>('AAPL');
   
-  // Update selected stock when stocks change
-  React.useEffect(() => {
-    if (stocks.length > 0 && !stocks.find(s => s.symbol === selectedStock?.symbol)) {
-      setSelectedStock(stocks[0]);
-    }
-  }, [stocks, selectedStock?.symbol]);
+  // Get the current selected stock from stocks array
+  const selectedStock = React.useMemo(() => {
+    return stocks.find(s => s.symbol === selectedSymbol) || stocks[0];
+  }, [stocks, selectedSymbol]);
   
-  const stocksWithHistory = stocks.map(stock => {
-    return {
+  const stocksWithHistory = React.useMemo(() => {
+    return stocks.map(stock => ({
       ...stock,
       priceHistory: generatePriceHistory(30, stock.price, 2)
-    };
-  });
+    }));
+  }, [stocks]);
   
   return (
     <PageLayout title="Stocks">
@@ -56,8 +54,8 @@ const Stocks = () => {
                 key={stock.symbol} 
                 stock={stock} 
                 priceHistory={stock.priceHistory}
-                onClick={() => setSelectedStock(stock)}
-                className={selectedStock?.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
+                onClick={() => setSelectedSymbol(stock.symbol)}
+                className={selectedSymbol === stock.symbol ? "ring-2 ring-primary" : ""}
               />
             ))}
           </div>
