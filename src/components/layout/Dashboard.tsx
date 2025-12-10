@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { 
-  useStockData, useMarketIndices, useCurrencyPairs, 
-  mockStocks, mockIndices, mockCurrencies, mockNews,
+  useMarketIndices, useCurrencyPairs, 
+  mockIndices, mockCurrencies, mockNews,
   generatePriceHistory 
 } from '@/utils/stocksApi';
+import { useRealStockData } from '@/hooks/useRealStockData';
 import { Navbar } from '@/components/layout/Navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { StockCard } from '@/components/stocks/StockCard';
@@ -13,14 +14,17 @@ import { MarketOverview } from '@/components/markets/MarketOverview';
 import { CurrencyExchange } from '@/components/currencies/CurrencyExchange';
 import { NewsCard } from '@/components/news/NewsCard';
 import { StatsCard } from '@/components/ui/StatsCard';
-import { BarChart3, TrendingDown, TrendingUp, Wallet2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BarChart3, RefreshCw, TrendingDown, TrendingUp, Wallet2 } from 'lucide-react';
 
 export function Dashboard() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [selectedStock, setSelectedStock] = useState(mockStocks[0]);
   
-  // Use our hooks to get real-time mock data
-  const stocks = useStockData(mockStocks);
+  // Use real stock data hook
+  const { stocks, loading, lastFetched, refetch } = useRealStockData(300000); // Refresh every 5 min
+  const [selectedStock, setSelectedStock] = useState(stocks[0]);
+  
+  // Use our hooks to get real-time mock data for indices/currencies
   const indices = useMarketIndices(mockIndices);
   const currencies = useCurrencyPairs(mockCurrencies);
   
@@ -58,7 +62,25 @@ export function Dashboard() {
         
         <main className="flex-1 transition-all duration-300">
           <div className="container max-w-full p-4 lg:p-6 animate-fade-in">
-            <h1 className="text-2xl font-bold mb-6">Market Dashboard</h1>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold">Market Dashboard</h1>
+              <div className="flex items-center gap-2">
+                {lastFetched && (
+                  <span className="text-xs text-muted-foreground">
+                    Updated: {lastFetched.toLocaleTimeString()}
+                  </span>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={refetch}
+                  disabled={loading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+            </div>
             
             {/* Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
@@ -78,17 +100,17 @@ export function Dashboard() {
               />
               <StatsCard 
                 title="Top Gainer" 
-                value={topGainer.symbol}
-                trend={topGainer.changePercent}
-                trendLabel={topGainer.name}
+                value={topGainer?.symbol || 'N/A'}
+                trend={topGainer?.changePercent || 0}
+                trendLabel={topGainer?.name || ''}
                 icon={<TrendingUp />}
                 className="bg-success/5"
               />
               <StatsCard 
                 title="Top Loser" 
-                value={topLoser.symbol}
-                trend={topLoser.changePercent}
-                trendLabel={topLoser.name}
+                value={topLoser?.symbol || 'N/A'}
+                trend={topLoser?.changePercent || 0}
+                trendLabel={topLoser?.name || ''}
                 icon={<TrendingDown />}
                 className="bg-danger/5"
               />
