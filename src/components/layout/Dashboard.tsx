@@ -19,10 +19,13 @@ import { BarChart3, RefreshCw, TrendingDown, TrendingUp, Wallet2 } from 'lucide-
 
 export function Dashboard() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>('AAPL');
   
   // Use real stock data hook
   const { stocks, loading, lastFetched, refetch } = useRealStockData(300000); // Refresh every 5 min
-  const [selectedStock, setSelectedStock] = useState(stocks[0]);
+  
+  // Get selected stock from current stocks data
+  const selectedStock = stocks.find(s => s.symbol === selectedSymbol) || stocks[0];
   
   // Use our hooks to get real-time mock data for indices/currencies
   const indices = useMarketIndices(mockIndices);
@@ -127,8 +130,8 @@ export function Dashboard() {
                       key={stock.symbol} 
                       stock={stock} 
                       priceHistory={stock.priceHistory}
-                      onClick={() => setSelectedStock(stock)}
-                      className={selectedStock.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
+                      onClick={() => setSelectedSymbol(stock.symbol)}
+                      className={selectedSymbol === stock.symbol ? "ring-2 ring-primary" : ""}
                     />
                   ))}
                 </div>
