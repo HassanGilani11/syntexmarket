@@ -6,5 +6,8 @@ verify_jwt = false
 [functions.fetch-forex]
 verify_jwt = false
 
+[functions.fetch-crypto-history]
+verify_jwt = false
+
 [functions.fetch-stocks]
 verify_jwt = false
