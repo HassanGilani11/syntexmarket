@@ -3,5 +3,8 @@ project_id = "nsmfzrllnwiicknhehqn"
 [functions.fetch-crypto]
 verify_jwt = false
 
+[functions.fetch-forex]
+verify_jwt = false
+
 [functions.fetch-stocks]
 verify_jwt = false
