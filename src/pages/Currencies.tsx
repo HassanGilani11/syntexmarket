@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { CurrencyExchange } from '@/components/currencies/CurrencyExchange';
 import { CryptoList } from '@/components/currencies/CryptoList';
+import { CryptoChart } from '@/components/currencies/CryptoChart';
 import { PriceAlertDialog } from '@/components/currencies/PriceAlertDialog';
-import { useCurrencyPairs, mockCurrencies } from '@/utils/stocksApi';
+import { useCurrencyPairs, mockCurrencies, formatDate } from '@/utils/stocksApi';
 import { useRealCryptoData } from '@/hooks/useRealCryptoData';
 import { useForexRates } from '@/hooks/useForexRates';
 import { useCryptoAlerts } from '@/hooks/useCryptoAlerts';
@@ -13,7 +14,6 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RefreshCwIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatDate } from '@/utils/stocksApi';
 
 const currencyOptions = [
   { code: 'USD', name: 'US Dollar', symbol: '$' },
@@ -68,7 +68,11 @@ const Currencies = () => {
           onRefresh={refetchCrypto}
         />
       </div>
+
+      {/* Crypto Price Chart */}
+      <CryptoChart cryptos={cryptos} className="mt-6" />
       
+      {/* Currency Converter */}
       <div className="bg-card rounded-lg p-6 shadow mt-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Currency Converter</h2>
