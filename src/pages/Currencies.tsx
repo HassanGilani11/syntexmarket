@@ -2,59 +2,92 @@ import React, { useState, useEffect } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { CurrencyExchange } from '@/components/currencies/CurrencyExchange';
 import { CryptoList } from '@/components/currencies/CryptoList';
+import { PriceAlertDialog } from '@/components/currencies/PriceAlertDialog';
 import { useCurrencyPairs, mockCurrencies } from '@/utils/stocksApi';
 import { useRealCryptoData } from '@/hooks/useRealCryptoData';
+import { useForexRates } from '@/hooks/useForexRates';
+import { useCryptoAlerts } from '@/hooks/useCryptoAlerts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { RefreshCwIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { formatDate } from '@/utils/stocksApi';
+
+const currencyOptions = [
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+  { code: 'CHF', name: 'Swiss Franc', symbol: 'Fr' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+  { code: 'MXN', name: 'Mexican Peso', symbol: '$' },
+];
 
 const Currencies = () => {
   const currencies = useCurrencyPairs(mockCurrencies);
-  const { cryptos, loading, lastFetched, refetch } = useRealCryptoData(60000);
+  const { cryptos, loading: cryptoLoading, lastFetched: cryptoLastFetched, refetch: refetchCrypto } = useRealCryptoData(60000);
+  const { rates, loading: forexLoading, lastFetched: forexLastFetched, refetch: refetchForex, convert } = useForexRates(300000);
+  const { alerts, addAlert, removeAlert, clearTriggeredAlerts } = useCryptoAlerts(cryptos);
+  
   const [fromCurrency, setFromCurrency] = useState('USD');
   const [toCurrency, setToCurrency] = useState('EUR');
   const [amount, setAmount] = useState('1000');
   const [convertedAmount, setConvertedAmount] = useState('0');
 
-  // Exchange rates (simplified - in a real app, these would come from an API)
-  const exchangeRates: { [key: string]: { [key: string]: number } } = {
-    USD: { EUR: 0.92, GBP: 0.79, JPY: 149.50, USD: 1 },
-    EUR: { USD: 1.09, GBP: 0.86, JPY: 162.50, EUR: 1 },
-    GBP: { USD: 1.27, EUR: 1.16, JPY: 189.00, GBP: 1 },
-    JPY: { USD: 0.0067, EUR: 0.0062, GBP: 0.0053, JPY: 1 }
-  };
-
   useEffect(() => {
     const numAmount = parseFloat(amount) || 0;
-    const rate = exchangeRates[fromCurrency]?.[toCurrency] || 1;
-    const result = numAmount * rate;
+    const result = convert(numAmount, fromCurrency, toCurrency);
     setConvertedAmount(result.toFixed(2));
-  }, [amount, fromCurrency, toCurrency]);
+  }, [amount, fromCurrency, toCurrency, convert]);
 
-  const formatCurrency = (value: string, currencyCode: string) => {
-    const symbols: { [key: string]: string } = {
-      USD: '$',
-      EUR: '€',
-      GBP: '£',
-      JPY: '¥'
-    };
-    return `${symbols[currencyCode] || ''}${value}`;
-  };
+  const getSymbol = (code: string) => currencyOptions.find(c => c.code === code)?.symbol || '';
 
   return (
     <PageLayout title="Currency Exchange">
+      <div className="flex justify-end mb-4">
+        <PriceAlertDialog
+          cryptos={cryptos}
+          alerts={alerts}
+          onAddAlert={addAlert}
+          onRemoveAlert={removeAlert}
+          onClearTriggered={clearTriggeredAlerts}
+        />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CurrencyExchange currencies={currencies} />
         <CryptoList 
           cryptos={cryptos} 
-          loading={loading} 
-          lastFetched={lastFetched}
-          onRefresh={refetch}
+          loading={cryptoLoading} 
+          lastFetched={cryptoLastFetched}
+          onRefresh={refetchCrypto}
         />
       </div>
       
       <div className="bg-card rounded-lg p-6 shadow mt-6">
-        <h2 className="text-xl font-semibold mb-4">Currency Converter</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Currency Converter</h2>
+          <div className="flex items-center gap-2">
+            {forexLastFetched && (
+              <span className="text-xs text-muted-foreground">
+                Rates updated: {formatDate(forexLastFetched)}
+              </span>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={refetchForex}
+              disabled={forexLoading}
+            >
+              <RefreshCwIcon className={cn("h-4 w-4", forexLoading && "animate-spin")} />
+            </Button>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
@@ -64,10 +97,11 @@ const Currencies = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USD">USD - US Dollar</SelectItem>
-                  <SelectItem value="EUR">EUR - Euro</SelectItem>
-                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                  <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                  {currencyOptions.map(currency => (
+                    <SelectItem key={currency.code} value={currency.code}>
+                      {currency.code} - {currency.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -89,20 +123,24 @@ const Currencies = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="EUR">EUR - Euro</SelectItem>
-                  <SelectItem value="USD">USD - US Dollar</SelectItem>
-                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                  <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                  {currencyOptions.map(currency => (
+                    <SelectItem key={currency.code} value={currency.code}>
+                      {currency.code} - {currency.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label htmlFor="converted">Converted Amount</Label>
-              <div className="w-full px-3 py-2 border rounded-md bg-muted">
-                {formatCurrency(convertedAmount, toCurrency)}
+              <div className="w-full px-3 py-2 border rounded-md bg-muted font-medium">
+                {getSymbol(toCurrency)}{parseFloat(convertedAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
           </div>
+        </div>
+        <div className="mt-4 text-center text-sm text-muted-foreground">
+          1 {fromCurrency} = {convert(1, fromCurrency, toCurrency).toFixed(4)} {toCurrency}
         </div>
       </div>
     </PageLayout>
