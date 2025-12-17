@@ -67,7 +67,7 @@ export function StockChart({
   };
   
   return (
-    <Card className={cn("overflow-hidden h-full", className)}>
+    <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="flex-row items-center justify-between pb-4">
         <div>
           <CardTitle className="leading-none">{symbol}</CardTitle>

@@ -16,14 +16,14 @@ export function PageLayout({ children, title }: PageLayoutProps) {
   };
   
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex">
         <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
         
-        <main className="flex-1 transition-all duration-300 overflow-auto">
-          <div className="container max-w-full p-4 lg:p-6 animate-fade-in">
+        <main className="flex-1 transition-all duration-300 overflow-x-hidden">
+          <div className="p-4 lg:p-6">
             <h1 className="text-2xl font-bold mb-6">{title}</h1>
             {children}
           </div>

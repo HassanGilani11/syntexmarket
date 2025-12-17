@@ -74,7 +74,7 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
 
   return (
     <aside className={cn(
-      "bg-sidebar text-sidebar-foreground relative transition-all duration-300 ease-in-out flex flex-col border-r border-sidebar-border h-full shrink-0",
+      "bg-sidebar text-sidebar-foreground relative transition-all duration-300 ease-in-out flex flex-col border-r border-sidebar-border shrink-0 sticky top-0 self-start min-h-[calc(100vh-64px)]",
       isCollapsed ? "w-16" : "w-64",
       className
     )}>
